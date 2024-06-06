@@ -1,0 +1,10 @@
+../Core/Src/Mq2.c:5:14:Mq2_callback	16	static
+../Core/Src/Mq2.c:8:6:Mq2_init	24	static
+../Core/Src/Mq2.c:13:6:Mq2_handle	24	static
+../Core/Src/Mq2.c:28:6:set_Sensor_volt	24	static
+../Core/Src/Mq2.c:32:6:set_RS_air	16	static
+../Core/Src/Mq2.c:35:6:set_RS_gas	16	static
+../Core/Src/Mq2.c:38:6:set_RO	16	static
+../Core/Src/Mq2.c:42:6:set_ratino	16	static
+../Core/Src/Mq2.c:45:6:set_ppm	24	static
+../Core/Src/Mq2.c:49:6:set_percent_result	16	static
