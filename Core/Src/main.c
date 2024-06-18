@@ -18,8 +18,8 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "stdlib.h"
 #include "liquidcrystal_i2c.h"
+#include "stdlib.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -45,39 +45,30 @@ ADC_HandleTypeDef hadc1;
 
 I2C_HandleTypeDef hi2c1;
 
-
 /* USER CODE BEGIN PV */
-Tyde_Def_MQ2 mq2;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_I2C1_Init(void);
 static void MX_ADC1_Init(void);
+static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-float data;
-void Mq2_callback(float value){
-	data = value;
-}
 /* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
   * @retval int
   */
-uint16_t value;
 int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-	 float percent=0;
-	 float canhbao = 0.25;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -98,51 +89,48 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_I2C1_Init();
   MX_ADC1_Init();
-  Mq2_init(&mq2,&hadc1,0.574,-2.222);
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  /* USER CODE END Includes */
-
-    /* USER CODE BEGIN 2 */
-
-    char snum[5];
-    hadc1.Instance;
+  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_3,1);
   /* USER CODE END 2 */
-
+  int value;
+  char snum[5];
+  int canhbao=400;
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  Mq2_handle(&mq2);
-	  percent = mq2.percent_result;
-	      /* USER CODE BEGIN 3 */
-	      itoa(percent,snum , 10);
-	       HD44780_Init(2);
-	       HD44780_Clear();
-	       HD44780_SetCursor(0,0);
-	       HD44780_PrintStr("nong do khi ga");
-	       HD44780_SetCursor(17,1);
-	       HD44780_PrintStr(snum);
-	  		if(percent <= canhbao)
-	  		 {
-	  		 HAL_GPIO_WritePin(GPIOA,GPIO_PIN_3,1);
-	  		 HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,0);
-	  		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4,0);
-	  		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_6,0);
-	  		 }
-	  		 else
-	  		 {
-	  			HAL_GPIO_WritePin(GPIOA,GPIO_PIN_3,0);
-	  			HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4,1);
-	  		 HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,1);
-	  		 HAL_GPIO_WritePin(GPIOA,GPIO_PIN_6,1);
-	  		 }
-	  		 }
-        HAL_Delay(5000);
+	  HAL_ADC_Start(&hadc1);
+	   value= HAL_ADC_GetValue(&hadc1);
+	   itoa(value,snum , 10);
+		       HD44780_Init(2);
+		       HD44780_Clear();
+		       HD44780_SetCursor(0,0);
+		       HD44780_PrintStr("sensor value ");
+		       HD44780_SetCursor(0,1);
+		       HD44780_PrintStr(snum);
+		  		if(value <= canhbao)
+		  		 {
+		  		 HAL_GPIO_WritePin(GPIOA,GPIO_PIN_3,1);
+		  		 HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,0);
+		  		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4,0);
+		  		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_6,0);
+		  		 }
+		  		 else
+		  		 {
+		  			HAL_GPIO_WritePin(GPIOA,GPIO_PIN_3,0);
+		  			HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4,1);
+		  		 HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,1);
+		  		 HAL_GPIO_WritePin(GPIOA,GPIO_PIN_6,1);
+		  		 }
+	        HAL_Delay(2000);
+    /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
+}
 
 /**
   * @brief System Clock Configuration
@@ -285,11 +273,15 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PC13 */
   GPIO_InitStruct.Pin = GPIO_PIN_13;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
@@ -299,12 +291,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configures the port and pin on which the EVENTOUT Cortex signal will be connected */
-  HAL_GPIOEx_ConfigEventout(AFIO_EVENTOUT_PORT_C, AFIO_EVENTOUT_PIN_13);
-
-  /*Enables the Event Output */
-  HAL_GPIOEx_EnableEventout();
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
@@ -325,7 +311,6 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
-
   }
   /* USER CODE END Error_Handler_Debug */
 }
